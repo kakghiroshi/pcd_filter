@@ -131,15 +131,16 @@ void pointPickingEventOccurred (const pcl::visualization::PointPickingEvent& eve
     {
         return;
     }
-
-    float x, y, z;
-    event.getPoint(x, y, z);
+    pcl::PointXYZ clicked_point;
+    event.getPoint(clicked_point.x, clicked_point.y, clicked_point.z);
+    //float x, y, z;
+    //event.getPoint(x, y, z);
     pcl::visualization::PCLVisualizer* viewer = static_cast<pcl::visualization::PCLVisualizer*>(viewer_void);
     viewer->removeShape("sphere");
-    viewer->addSphere(pcl::PointXYZ(x, y, z), 0.05, "sphere", 0);
+    viewer->addSphere(pcl::PointXYZ(clicked_point.x,clicked_point.y, clicked_point.z), 0.05, "sphere", 0);
     viewer->spinOnce();
     std::cout << "Point index: " << index << std::endl;
-    std::cout << "Point coordinates: (" << x << ", " << y << ", " << z << ")" << std::endl;
+    std::cout << "Point coordinates: (" << clicked_point.x << ", " << clicked_point.y << ", " << clicked_point.z << ")" << std::endl;
 }
 
 int main() {

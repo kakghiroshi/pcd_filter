@@ -135,12 +135,29 @@ void pointPickingEventOccurred (const pcl::visualization::PointPickingEvent& eve
     event.getPoint(clicked_point.x, clicked_point.y, clicked_point.z);
     //float x, y, z;
     //event.getPoint(x, y, z);
+    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
+    tree->setInputCloud(in_cloud);
     pcl::visualization::PCLVisualizer* viewer = static_cast<pcl::visualization::PCLVisualizer*>(viewer_void);
     viewer->removeShape("sphere");
-    viewer->addSphere(pcl::PointXYZ(clicked_point.x,clicked_point.y, clicked_point.z), 0.05, "sphere", 0);
+    viewer->addSphere(pcl::PointXYZ(clicked_point.x,clicked_point.y, clicked_point.z), 0.01, "sphere", 0);
     viewer->spinOnce();
     std::cout << "Point index: " << index << std::endl;
     std::cout << "Point coordinates: (" << clicked_point.x << ", " << clicked_point.y << ", " << clicked_point.z << ")" << std::endl;
+
+    int K = 10;  // 查询的最近邻数
+    std::vector<int> pointIdxNKNSearch(K);
+    std::vector<float> pointNKNSquaredDistance(K);
+
+    if (tree->nearestKSearch(clicked_point, K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0)
+    {
+        std::cout << "The closest " << K << " points to the clicked point are: " << std::endl;
+
+        for (size_t i = 0; i < pointIdxNKNSearch.size(); ++i)
+            std::cout << "    " << in_cloud->points[pointIdxNKNSearch[i]].x
+                      << " " << in_cloud->points[pointIdxNKNSearch[i]].y
+                      << " " << in_cloud->points[pointIdxNKNSearch[i]].z
+                      << " (distance: " << sqrt(pointNKNSquaredDistance[i]) << ")" << std::endl;
+    }
 }
 
 int main() {
@@ -218,7 +235,7 @@ int main() {
             viewer.spinOnce ();
             
         }
-        pcl::PointXYZ point = input_cloud->points[index];
+        //pcl::PointXYZ point = input_cloud->points[index];
 
         
      

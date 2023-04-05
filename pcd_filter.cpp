@@ -124,7 +124,7 @@ void cloudHandler(pcl::PointCloud<pcl::PointXYZ>::Ptr& in_cloud,pcl::PointCloud<
 */
 
 
-void pointPickingEventOccurred (const pcl::visualization::PointPickingEvent& event, void* viewer_void，std::string pcd_path)
+void pointPickingEventOccurred (const pcl::visualization::PointPickingEvent& event, void* viewer_void)
 {
     int index = event.getPointIndex ();
     if (index == -1)
@@ -136,8 +136,6 @@ void pointPickingEventOccurred (const pcl::visualization::PointPickingEvent& eve
     //float x, y, z;
     //event.getPoint(x, y, z);
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr in_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::io::loadPCDFile(pcd_path, *in_cloud);
     tree->setInputCloud(in_cloud);
     pcl::visualization::PCLVisualizer* viewer = static_cast<pcl::visualization::PCLVisualizer*>(viewer_void);
     viewer->removeShape("sphere");
@@ -225,12 +223,12 @@ int main() {
    for(int j=0;j<file_count;j++){
         std::string pcd_path = pcd_folder  + files1[j].c_str();
         std::string output_path = chessboard_folder  + files1[j].c_str();
-        
-        
-        pcl::visualization::PCLVisualizer viewer("PCL Viewer");
+        pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::io::loadPCDFile(pcd_path, *input_cloud);
+         pcl::visualization::PCLVisualizer viewer("PCL Viewer");
         viewer.addPointCloud(input_cloud, "cloud");
 
-        viewer.registerPointPickingCallback (pointPickingEventOccurred, (void*)&viewer,pcd_path);
+        viewer.registerPointPickingCallback (pointPickingEventOccurred, (void*)&viewer);
 
         while (!viewer.wasStopped ())
         {
@@ -244,4 +242,3 @@ int main() {
     }
     return 0;
 }
-
